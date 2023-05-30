@@ -40,3 +40,23 @@ export const getDataGeocoder = ( dir ) => {
     // });
 
 }
+
+export const getGeoCoders = () => {
+    const url  = backend + '/obtenerGeoCoders';
+    const data = fetch( url )
+        .then( response => response.json() )
+        .then( response => {
+            return response;
+        } );
+    return data;
+}
+
+export const getFCGeoCoders = ( idGeoCoder ) => {
+    const url  = backend + '/'+idGeoCoder+'/formasCanonicas';
+    const data = fetch( url )
+        .then( response => response.json() )
+        .then( response => {
+            return response;
+        } );
+    return data;
+}

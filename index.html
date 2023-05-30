@@ -26,6 +26,7 @@
             height: 100vh;
         }
     </style>
+    <script type="module" src="./js/funciones.js"></script>
 </head>
 
 <body>
@@ -40,6 +41,9 @@
                     <div class="input-group mb-3">
                         <input id="address" type="text" class="form-control" placeholder="Ingrese la dirección">
                         <button id="btnBuscar" class="btn btn-outline-secondary" type="button">Buscar</button>
+                    </div>
+                    <div id="infoFCGeocoder" class="info-fc-geocoder">
+                    
                     </div>
                     <div id="listaDeResultados" class="list-group">
 
@@ -63,6 +67,7 @@
 
         <script type="module">
             import { getDataGeocoder } from "./js/apiGeocoder.js";
+            //import getGeoCoders from "./js/apiGeocoder.js";
 
             //dibujo el mapa e inicializo variables que seran utiles luego
             let mapa = L.map('mapa');
