@@ -2,9 +2,12 @@
 import {getGeoCoders} from "./apiGeocoder.js";
 import {getFCGeoCoders} from "./apiGeocoder.js";
 
+
+//export const getDir = (idGeoCoder, idFormaCanonica) => {
 const fcMap = new Map();
 
-const geocodersJson = await getGeoCoders();
+const geocodersJson = getGeoCoders();
+console.log("tero")
 console.log(geocodersJson)
 const listIdGeocoder = Object.keys(geocodersJson)
 
@@ -16,6 +19,8 @@ for (let i in listIdGeocoder ) {
 }
    
 console.log(fcMap);
+
+//}
         
         
                     /////////////////////////////

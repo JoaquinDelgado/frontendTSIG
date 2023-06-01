@@ -46,13 +46,26 @@ export const getGeoCoders = () => {
     const data = fetch( url )
         .then( response => response.json() )
         .then( response => {
+            
+            console.log("otro",response)
             return response;
+
         } );
     return data;
 }
 
 export const getFCGeoCoders = ( idGeoCoder ) => {
     const url  = backend + '/'+idGeoCoder+'/formasCanonicas';
+    const data = fetch( url )
+        .then( response => response.json() )
+        .then( response => {
+            return response;
+        } );
+    return data;
+}
+
+export const getDireccionEstructurada = (idGeoCoder, idFormaCanonica) => {
+    const url  = backend + '/busquedaDireccionEstructurada/'+idGeoCoder+'/'+idFormaCanonica;
     const data = fetch( url )
         .then( response => response.json() )
         .then( response => {
