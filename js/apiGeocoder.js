@@ -13,21 +13,21 @@ export const getDataGeocoder = ( dir ) => {
     return data;  
 }
 
-export const getGeoCoders = () => {
-    const url  = backend + '/obtenerGeoCoders';
+export const getGeoCoders = (idFormaCanonica) => {
+    const url  = backend + '/obtenerGeoCoders?idFormaCanonica='+idFormaCanonica;
     const data = fetch( url )
         .then( response => response.json() )
         .then( response => {
             
-            console.log("otro",response)
+            console.log("lista de geocoders",response)
             return response;
 
         } );
     return data;
 }
 
-export const getFCGeoCoders = ( idGeoCoder ) => {
-    const url  = backend + '/'+idGeoCoder+'/formasCanonicas';
+export const getFCGeoCoders = () => {
+    const url  = backend + '/formasCanonicas';
     const data = fetch( url )
         .then( response => response.json() )
         .then( response => {

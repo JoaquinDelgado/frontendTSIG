@@ -49,15 +49,10 @@
                     </div>
                     
                     <!-- Button trigger modal -->
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                    <button id="btnConfigurarBusqueda" type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
                         Configurar Búsqueda
                     </button>
   
-
-                    <div id="infoFCGeocoder" class="info-fc-geocoder">
-                    
-                    </div>
-
                     <div id="listaDeResultados" class="rounded-2 list-group " style="height: 75vh !important;">
 
                     </div>
@@ -83,22 +78,18 @@
                 </button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label for="comboFC">Forma Canonica</label>
-                        <select class="form-control" id="comboFC">
-                            <option value="1"> calle, numero, localidad, departamento			</option>
-                            <option value="2"> calle, numero, calle2, localidad, departamento	</option>
-                            <option value="3"> calle, manzana, solar, localidad, departamento	</option>
-                            <option value="4"> nombreInmueble, localidad, departamento		    </option>
-                            <option value="5"> numeroRuta, kilometro							</option>
+                    <div class="input-group mb-3">
+                        <select id="comboFormasCanonicas" class="form-select" aria-label="Seleccione una forma canónica">
+                        
                         </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="combo2">Geocodificador</label>
-                        <select class="form-control" id="comboGC">
-                            <option value="opcion1">IDE</option>
+                      </div>
+                      
+            
+                      <div class="input-group mb-3">
+                        <select id="comboGeocoders" class="form-select" aria-label="Seleccione un geocodificador">
+                          <option value="">Seleccione un geocodificador</option>
                         </select>
-                    </div>
+                      </div>
                 </div>
                 <!-- Pie del modal -->
                 <div class="modal-footer">
@@ -121,8 +112,9 @@
               </script>
         <script type="module">
             import { getDataGeocoder } from "./js/apiGeocoder.js";
+            import { getFCGeoCoders } from "./js/apiGeocoder.js";
+            import { getGeoCoders } from "./js/apiGeocoder.js";
             import { getDireccionEstructurada } from "./js/apiGeocoder.js";
-            //import getGeoCoders from "./js/apiGeocoder.js";
 
             //dibujo el mapa e inicializo variables que seran utiles luego
             let mapa = L.map('mapa');
@@ -145,16 +137,9 @@
                 dibujarListaDeResultados(resp);
             }
 
-            btnBuscaEstructurada.onclick = async () => {
-                const resp = await getDireccionEstructurada(1,1);
-
-                dibujarListaDeResultados(resp);
-            }
-
-            btnBuscaEstructurada.onclick = async () => {
-                const resp = await getDireccionEstructurada(1,1);
-
-                dibujarListaDeResultados(resp);
+            btnConfigurarBusqueda.onclick = async () => {
+                const resp = await getFCGeoCoders();
+                listarFormasCanonicas(resp);
             }
 
             const dibujarListaDeResultados = (elementos) => {
@@ -189,6 +174,44 @@
                 }
             }
 
+            const listarFormasCanonicas = (opcionesFC) => {
+                const selectComboFC = document.getElementById('comboFormasCanonicas');
+
+                // Eliminamos las opciones anteriores
+                selectComboFC.innerHTML = '';
+
+                for (const key in opcionesFC) {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.text = opcionesFC[key];
+                    selectComboFC.appendChild(option);
+                }               
+            }
+
+            // Evento change para el comboFormasCanonicas
+            document.getElementById("comboFormasCanonicas").addEventListener("change", async function () {
+                const formaCanonica = this.value;
+                const comboGeocoders = document.getElementById("comboGeocoders");
+
+                // Limpiar opciones anteriores del comboGeocoders
+                comboGeocoders.innerHTML = '<option value="">Seleccione un geocodificador</option>';
+
+                if (formaCanonica !== "") {
+                    // Obtener los geocodificadores según la forma canónica seleccionada
+                    
+                    const geocoders = await getGeoCoders(formaCanonica);
+                   
+
+                    // Crear y agregar nuevas opciones al comboGeocoders
+                    for (const key in geocoders) {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        option.text = geocoders[key];
+                        comboGeocoders.appendChild(option);
+                    }
+                }
+            });
+            
         </script>
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>

@@ -13,7 +13,7 @@ const listIdGeocoder = Object.keys(geocodersJson)
 
 for (let i in listIdGeocoder ) {
   const idGeocoder = listIdGeocoder[i];
-  const fcDelGeocoder = await getFCGeoCoders(1)
+  const fcDelGeocoder = await getFCGeoCoders()
   console.log(fcDelGeocoder) 
   fcMap.set(idGeocoder, fcDelGeocoder);
 }
