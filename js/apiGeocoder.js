@@ -36,8 +36,9 @@ export const getFCGeoCoders = () => {
     return data;
 }
 
-export const getDireccionEstructurada = (idGeoCoder, idFormaCanonica) => {
-    const url  = backend + '/busquedaDireccionEstructurada/'+idGeoCoder+'/'+idFormaCanonica;
+export const getDireccionEstructurada = (idGeoCoder, idFormaCanonica, intputDir) => {
+    const paramBuscar = intputDir //FIXME parsear lo ingresado con la forma canónica
+    const url  = backend + '/busquedaDireccionEstructurada/'+idGeoCoder+'/'+idFormaCanonica+'?'+paramBuscar;
     const data = fetch( url )
         .then( response => response.json() )
         .then( response => {
