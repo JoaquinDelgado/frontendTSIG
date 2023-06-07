@@ -1,49 +1,61 @@
 const backend = 'http://localhost:8080/api';
 
-export const getDataGeocoder = ( dir ) => {
-    
-    const url  = backend + '/busquedaDireccion/' + dir;
-    const data = fetch( url )
-        .then( response => response.json() )
-        .then( response => {
-            return response;
-        } )
-        .catch( error => { console.log(error.message) } );
+export const getDataGeocoder = (dir) => {
 
-    return data;  
+    const url = backend + '/busquedaDireccionEstructurada/ ' + dir;
+    const data = fetch(url)
+        .then(response => response.json())
+        .then(response => {
+            return response;
+        })
+        .catch(error => { console.log(error.message) });
+
+    return data;
 }
 
 export const getGeoCoders = (idFormaCanonica) => {
-    const url  = backend + '/obtenerGeoCoders?idFormaCanonica='+idFormaCanonica;
+    const url = backend + '/obtenerGeoCoders?idFormaCanonica=' + idFormaCanonica;
+    const data = fetch(url)
+        .then(response => response.json())
+        .then(response => {
+            console.log("lista de geocoders", response)
+            return response;
+        });
+
+    return data;
+}
+
+export const getPuntosSugeridos = (input) => {
+    //const data = ['Fernandez crespo', 'Freire 129', 'Jose B. Freire 129'];
+
+    const url = backend + '/sugerenciaCalleCompleta/' + input;
     const data = fetch( url )
         .then( response => response.json() )
         .then( response => {
-            
-            console.log("lista de geocoders",response)
             return response;
-
         } );
+
     return data;
 }
 
 export const getFCGeoCoders = () => {
-    const url  = backend + '/formasCanonicas';
-    const data = fetch( url )
-        .then( response => response.json() )
-        .then( response => {
+    const url = backend + '/formasCanonicas';
+    const data = fetch(url)
+        .then(response => response.json())
+        .then(response => {
             return response;
-        } );
+        });
     return data;
 }
 
 export const getDireccionEstructurada = (idGeoCoder, idFormaCanonica, intputDir) => {
     const paramBuscar = intputDir //FIXME parsear lo ingresado con la forma canónica
-    const url  = backend + '/busquedaDireccionEstructurada/'+idGeoCoder+'/'+idFormaCanonica+'?'+paramBuscar;
-    const data = fetch( url )
-        .then( response => response.json() )
-        .then( response => {
+    const url = backend + '/busquedaDireccionEstructurada/' + idGeoCoder + '/' + idFormaCanonica + '?' + paramBuscar;
+    const data = fetch(url)
+        .then(response => response.json())
+        .then(response => {
             return response;
-        } );
+        });
     return data;
-    
+
 }

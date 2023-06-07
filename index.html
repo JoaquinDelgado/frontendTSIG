@@ -14,18 +14,9 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
+    <link rel="stylesheet" href="/css/styles.css">
+
     <title>TSIG 2023 - Geocoder</title>
-
-    <style>
-        html {
-            height: 100%;
-        }
-
-        body {
-            max-height: 100%;
-            height: 100vh;
-        }
-    </style>
 
 </head>
 
@@ -40,9 +31,14 @@
             <div class="row g-3 h-100">
                 <div class="col-4">
 
-                    <div class="input-group mb-3">
-                        <input id="address" type="text" class="form-control" placeholder="Ingrese la dirección">
-                        <button id="btnBuscar" class="btn btn-outline-secondary" type="button">Buscar</button>
+                    <div class="autocomplete ">
+                        <div class="input-group">
+                            <input id="address" type="text" class="form-control" placeholder="Ingrese la dirección">
+                            <button id="btnBuscar" class="btn btn-outline-secondary" type="button">Buscar</button>
+                        </div>
+                        <ul id="listaPuntosSugereridos" class="options list-group">
+
+                        </ul>
                     </div>
                     <div class="input-group mb-3">
                         <input id="address" type="text" class="form-control" placeholder="Ingrese la dirección">
@@ -62,7 +58,6 @@
                     <div id="listaDeResultados" class="rounded-2 list-group " style="height: 75vh !important;">
 
                     </div>
-
                 </div>
                 <div class="col-8">
                     <div id="mapa" class="h-100">
@@ -110,6 +105,8 @@
 
         <script type="module">
             import { getDataGeocoder, getFCGeoCoders, getGeoCoders, getDireccionEstructurada } from "./js/apiGeocoder.js";
+            import { inicializarEventosPuntosSugeridos } from "./js/logicaListaDePuntosSugeridos.js";
+            import { dibujarListaDeResultados } from "./js/logicaListaDeResultados.js";
             
             function guardarSeleccion() {
                 var comboFC = document.getElementById("comboFormasCanonicas");
@@ -129,22 +126,14 @@
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png?', {}).addTo(mapa);
 
             //Obtengo componentes
-            const inputDir = document.getElementById('address');
-            const listaDeResultados = document.getElementById('listaDeResultados');
             const btnBuscar = document.getElementById('btnBuscar');
+
             const btnModalGuardar = document.getElementById('btnModalGuardar');
             const comboFC = document.getElementById("comboFormasCanonicas");
 
             //Logica de la aplicacion
-
-            inputDir.value = 'Jose B. Freire 129';
-
-            btnBuscar.onclick = async () => {
-                const resp = await getDataGeocoder(inputDir.value);
-                console.log(resp);
-                dibujarListaDeResultados(resp);
-            }
-
+            inicializarEventosPuntosSugeridos();
+            
             btnModalGuardar.onclick = () => {
                 guardarSeleccion();
             }
@@ -152,45 +141,16 @@
             btnBuscaEstructurada.onclick = async () => {
                 var comboFC = document.getElementById("comboFormasCanonicas").value;
                 var comboGeocoders = document.getElementById("comboGeocoders").value;
+                
                 const resp = await getDireccionEstructurada(comboGeocoders, comboFC, "Calle=Lomas de zamora");
                 console.log(resp)
+                
+                //dibujarListaDeResultados(resp);
             }
 
             btnConfigurarBusqueda.onclick = async () => {
                 const resp = await getFCGeoCoders();
                 listarFormasCanonicas(resp);
-            }
-
-            const dibujarListaDeResultados = (elementos) => {
-                const htmlElementos = elementos.map((elem) => {
-                    let html = '';
-                    html = '<button type="button" class="geometry list-group-item list-group-item-action" x="' + elem.puntoX + '" y="' + elem.puntoY + '">';
-                    html += elem.direccion.calle.nombre_normalizado + ' ' + elem.direccion.numero?.nro_puerta + '<br>';
-                    html += elem.direccion.departamento.nombre_normalizado;
-                    html += '</button>';
-
-                    return html;
-                });
-                //Muestro los elementos en el html
-                listaDeResultados.innerHTML = htmlElementos.join("");
-                listaDeResultados.classList.add("overflow-y-scroll");
-                //seteo los eventos clicks de cada resultado
-                const resultados = document.getElementsByClassName('geometry');
-
-                for (let i = 0; i < resultados.length; i++) {
-                    let resultado = resultados[i];
-
-                    resultado.onclick = () => {
-                        const x = resultado.getAttribute('x');
-                        const y = resultado.getAttribute('y');
-
-                        mapa.setView([y, x], 11);
-                        let marcador = L.marker([y, x]).addTo(mapa);
-
-                        marcador.bindPopup(resultado.innerHTML);
-                    };
-
-                }
             }
 
             const listarFormasCanonicas = (opcionesFC) => {
