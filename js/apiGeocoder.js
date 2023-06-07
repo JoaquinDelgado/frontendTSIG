@@ -28,7 +28,7 @@ export const getGeoCoders = (idFormaCanonica) => {
 export const getPuntosSugeridos = (input) => {
     //const data = ['Fernandez crespo', 'Freire 129', 'Jose B. Freire 129'];
 
-    const url = backend + '/sugerenciaCalleCompleta/' + input;
+    const url = backend + '/sugerenciaCalleCompleta?entrada=' + input;
     const data = fetch( url )
         .then( response => response.json() )
         .then( response => {
@@ -50,7 +50,8 @@ export const getFCGeoCoders = () => {
 
 export const getDireccionEstructurada = (idGeoCoder, idFormaCanonica, intputDir) => {
     const paramBuscar = intputDir //FIXME parsear lo ingresado con la forma canónica
-    const url = backend + '/busquedaDireccionEstructurada/' + idGeoCoder + '/' + idFormaCanonica + '?' + paramBuscar;
+    // const url = backend + '/busquedaDireccionEstructurada/' + idGeoCoder + '/' + idFormaCanonica + '?' + paramBuscar;
+    const url = backend + '/busquedaDireccionEstructurada/1/1?' + paramBuscar;
     const data = fetch(url)
         .then(response => response.json())
         .then(response => {

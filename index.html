@@ -26,12 +26,12 @@
 
         <h1 class="text-center p-4">TSIG - Grupo 4 Geocoder</h1>
 
-        <div class="container-fluid vh-75">
+        <div class="container-fluid" style="height: 60vh;">
 
             <div class="row g-3 h-100">
                 <div class="col-4">
 
-                    <div class="autocomplete ">
+                    <div class="autocomplete mb-3">
                         <div class="input-group">
                             <input id="address" type="text" class="form-control" placeholder="Ingrese la dirección">
                             <button id="btnBuscar" class="btn btn-outline-secondary" type="button">Buscar</button>
@@ -40,12 +40,7 @@
 
                         </ul>
                     </div>
-                    <div class="input-group mb-3">
-                        <input id="address" type="text" class="form-control" placeholder="Ingrese la dirección">
-                        <button id="btnBuscaEstructurada" class="btn btn-outline-secondary" type="button">Búqueda por
-                            FC</button>
-                    </div>
-
+                    
                     <!-- Button trigger modal -->
                     <button id="btnConfigurarBusqueda" type="button" class="btn btn-primary" data-bs-toggle="modal"
                         data-bs-target="#staticBackdrop">
@@ -53,10 +48,8 @@
                     </button>
                     
                     <label id="resultadoSeleccion" class="form-label"></label>
-
-
-                    <div id="listaDeResultados" class="rounded-2 list-group " style="height: 75vh !important;">
-
+                    
+                    <div id="listaDeResultados" class="rounded-2 list-group mt-3" style="height: 75vh !important;">
                     </div>
                 </div>
                 <div class="col-8">
@@ -138,14 +131,14 @@
                 guardarSeleccion();
             }
 
-            btnBuscaEstructurada.onclick = async () => {
+            btnBuscar.onclick = async () => {
                 var comboFC = document.getElementById("comboFormasCanonicas").value;
                 var comboGeocoders = document.getElementById("comboGeocoders").value;
                 
-                const resp = await getDireccionEstructurada(comboGeocoders, comboFC, "Calle=Lomas de zamora");
+                const resp = await getDireccionEstructurada(comboGeocoders, comboFC, "calle=Lomas de zamora");
                 console.log(resp)
                 
-                //dibujarListaDeResultados(resp);
+                dibujarListaDeResultados(resp);
             }
 
             btnConfigurarBusqueda.onclick = async () => {

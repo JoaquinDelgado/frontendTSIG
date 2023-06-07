@@ -4,12 +4,12 @@ export const inicializarEventosPuntosSugeridos = () => {
     const input = document.getElementById('address');
     const DomListaPuntosSugeridos = document.getElementById('listaPuntosSugereridos');
         
-    input.addEventListener('input', function () {
+    input.addEventListener('input', async function () {
         const inputValue = this.value.toLowerCase();
         const inputLength = inputValue.length;
 
         if (inputLength > 3) {
-            const puntosSugeridos = getPuntosSugeridos( inputValue );
+            const puntosSugeridos = await getPuntosSugeridos( inputValue );
 
             dibujarListaDePuntosSugeridos( puntosSugeridos );
         } else {
@@ -25,15 +25,12 @@ export const dibujarListaDePuntosSugeridos = ( puntos ) => {
     const btnBuscar = document.getElementById('btnBuscar');
     const DomListaPuntosSugeridos = document.getElementById('listaPuntosSugereridos');
 
+    console.log(puntos);
     const htmlPuntosSugeridos = puntos.map( (punto) => {
         let html = '';
-        // html += '<li class="geometry list-group-item" x="' + punto.puntoX + '" y="' + punto.puntoY + '">';
-        // html += punto.direccion.calle.nombre_normalizado + ' ' + punto.direccion.numero?.nro_puerta + '<br>';
-        // html += punto.direccion.departamento.nombre_normalizado;
-        // html += '</li>';
-
-        html += '<li class="geometrySugest list-group-item d-block">';
-        html += punto;
+        html += '<li class="geometry list-group-item d-block">';
+        html += punto.calle + '<br>';
+        html += punto.departamento + ' ' + punto.localidad;
         html += '</li>';
 
         return html;

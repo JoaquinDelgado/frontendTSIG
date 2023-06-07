@@ -5,9 +5,14 @@ export const dibujarListaDeResultados = ( elementos, mapa ) => {
     const listaDeResultados = document.getElementById('listaDeResultados');
 
     const htmlElementos = elementos.map((elem) => {
+        let nroPuerta = '';
+        if (elem.direccion.numero && elem.direccion.numero.nro_puerta) {
+            nroPuerta = elem.direccion.numero.nro_puerta;
+        } 
+        
         let html = '';
         html = '<button type="button" class="geometry list-group-item list-group-item-action" x="' + elem.puntoX + '" y="' + elem.puntoY + '">';
-        html += elem.direccion.calle.nombre_normalizado + ' ' + elem.direccion.numero?.nro_puerta + '<br>';
+        html += elem.direccion.calle?.nombre_normalizado + ' ' + nroPuerta + '<br>';
         html += elem.direccion.departamento.nombre_normalizado;
         html += '</button>';
 
@@ -15,6 +20,8 @@ export const dibujarListaDeResultados = ( elementos, mapa ) => {
     });
     //Muestro los elementos en el html
     listaDeResultados.innerHTML = htmlElementos.join("");
+    listaDeResultados.classList.add("overflow-y-scroll");
+
     //seteo los eventos clicks de cada resultado
     const resultados = document.getElementsByClassName('geometry');
 
