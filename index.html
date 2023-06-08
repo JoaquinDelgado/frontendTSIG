@@ -72,9 +72,8 @@
                     </div>
                     <div class="modal-body">
                         <div class="input-group mb-3">
-                            <select id="comboFormasCanonicas" class="form-select"
-                                aria-label="Seleccione una forma canónica">
-
+                            <select id="comboFormasCanonicas" class="form-select" aria-label="Seleccione una forma canónica">
+                                <option value="">Seleccione una forma canonica</option>
                             </select>
                         </div>
 
@@ -100,7 +99,7 @@
             import { getDataGeocoder, getFCGeoCoders, getGeoCoders, getDireccionEstructurada } from "./js/apiGeocoder.js";
             import { inicializarEventosPuntosSugeridos } from "./js/logicaListaDePuntosSugeridos.js";
             import { dibujarListaDeResultados } from "./js/logicaListaDeResultados.js";
-            
+    /*        
             function guardarSeleccion() {
                 var comboFC = document.getElementById("comboFormasCanonicas");
                 var comboGeocoders = document.getElementById("comboGeocoders");
@@ -109,7 +108,25 @@
                 var fcTexto = comboFC.options[comboFC.selectedIndex].text;
                 var geocodersTexto = comboGeocoders.options[comboGeocoders.selectedIndex].text;
 
-                resultadoSeleccion.textContent = fcTexto + " - " + geocodersTexto;
+                resultadoSeleccion.innerHTML = "Forma Canonica: " + fcTexto + "<br>Geocoder: " + geocodersTexto;
+            }
+*/
+            function guardarSeleccion() {
+                var comboFC = document.getElementById("comboFormasCanonicas");
+                var comboGeocoders = document.getElementById("comboGeocoders");
+                var resultadoSeleccion = document.getElementById("resultadoSeleccion");
+
+                var fcTexto = "";
+                if (comboFC.selectedIndex !== -1) {
+                    fcTexto = comboFC.options[comboFC.selectedIndex].text;
+                }
+
+                var geocodersTexto = "";
+                if (comboGeocoders.selectedIndex !== -1) {
+                    geocodersTexto = comboGeocoders.options[comboGeocoders.selectedIndex].text;
+                }
+
+                resultadoSeleccion.innerHTML = "Forma Canonica: " + fcTexto + "<br>Geocoder: " + geocodersTexto;
             }
 
             //dibujo el mapa e inicializo variables que seran utiles luego
@@ -126,16 +143,20 @@
 
             //Logica de la aplicacion
             inicializarEventosPuntosSugeridos();
+            // Llamar a la función para establecer el valor por defecto al cargar la página
+            setDefaultValue();
             
             btnModalGuardar.onclick = () => {
                 guardarSeleccion();
+                const modal = bootstrap.Modal.getInstance(document.getElementById('staticBackdrop'));
+                modal.hide();
             }
 
             btnBuscar.onclick = async () => {
                 var comboFC = document.getElementById("comboFormasCanonicas").value;
                 var comboGeocoders = document.getElementById("comboGeocoders").value;
                 
-                const resp = await getDireccionEstructurada(comboGeocoders, comboFC, "calle=Lomas de zamora");
+                const resp = await getDireccionEstructurada(comboGeocoders, comboFC, "calle=Lomas de zamora&numero=3215");
                 console.log(resp)
                 
                 dibujarListaDeResultados(resp);
@@ -173,7 +194,6 @@
 
                     const geocoders = await getGeoCoders(formaCanonica);
 
-
                     // Crear y agregar nuevas opciones al comboGeocoders
                     for (const key in geocoders) {
                         const option = document.createElement('option');
@@ -184,10 +204,29 @@
                 }
             });
 
+            // Función para establecer un valor predeterminado en los combos
+            async function setDefaultValue() {
+                var comboFC = document.getElementById("comboFormasCanonicas");
+                var comboGeocoders = document.getElementById("comboGeocoders");
+                const defaultFC = 6 // Calle número
+                const defaultGeocoder = 1 // IDE
+                
+                const formasCanonicas = await getFCGeoCoders();
+                const geocoders = await getGeoCoders(defaultFC);
+                
+                const optionFC = document.createElement('option');
+                optionFC.value = defaultFC;
+                optionFC.text = formasCanonicas[defaultFC];
+                comboFC.appendChild(optionFC);
+                comboFC.selectedIndex = 1;                
+
+                const option = document.createElement('option');
+                option.value = defaultGeocoder; // Default - IDE
+                option.text = geocoders[defaultGeocoder];
+                comboGeocoders.appendChild(option);
+                comboGeocoders.selectedIndex = 1;
+                guardarSeleccion();
+            }
         </script>
-
-
-
     </body>
-
 </html>
