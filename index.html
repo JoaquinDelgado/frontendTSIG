@@ -31,26 +31,31 @@
             <div class="row g-3 h-100">
                 <div class="col-4">
 
-                    <div class="autocomplete mb-3">
-                        <div class="input-group">
-                            <input id="address" type="text" class="form-control" placeholder="Ingrese la dirección">
-                            <button id="btnBuscar" class="btn btn-outline-secondary" type="button">Buscar</button>
-                        </div>
-                        <ul id="listaPuntosSugereridos" class="options list-group">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="autocomplete">
+                                <div class="input-group">
+                                    <input id="address" type="text" class="form-control" placeholder="Ingrese la dirección">
+                                    <button id="btnBuscar" class="btn btn-outline-secondary" type="button">Buscar</button>
+                                </div>
+                                <div style="font-size: 0.75rem;" class="mx-1">
+                                    <p id="infoConfigAvanzada" class="text-secondary mt-1 mb-3"></p>
+                                    <a href="#" id="btnConfigurarBusqueda" class="link-secondary link-underline link-underline-opacity-0 link-underline-opacity-75-hover" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                        Configuración avanzada
+                                    </a>
+                                </div>
 
-                        </ul>
+                                <ul id="listaPuntosSugereridos" class="options list-group" style="height: 75vh !important;">
+        
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div id="listaDeResultados" class="mx-1 border rounded-2 list-group mt-2" style="height: 75vh !important;">
+                            </div>
+                        </div>
                     </div>
-                    
-                    <!-- Button trigger modal -->
-                    <button id="btnConfigurarBusqueda" type="button" class="btn btn-primary" data-bs-toggle="modal"
-                        data-bs-target="#staticBackdrop">
-                        Configurar Búsqueda
-                    </button>
-                    
-                    <label id="resultadoSeleccion" class="form-label"></label>
-                    
-                    <div id="listaDeResultados" class="rounded-2 list-group mt-3" style="height: 75vh !important;">
-                    </div>
+
                 </div>
                 <div class="col-8">
                     <div id="mapa" class="h-100">
@@ -68,7 +73,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="staticBackdropLabel">Configurar búsqueda</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button id="btnModalClose" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="input-group mb-3">
@@ -80,7 +85,9 @@
 
                         <div class="input-group mb-3">
                             <select id="comboGeocoders" class="form-select" aria-label="Seleccione un geocodificador">
-                                <option value="">Seleccione un geocodificador</option>
+                                <option value="0">Seleccione un geocodificador</option>
+                                <option value="1">IDE</option>
+                                <option value="2">NOMINATIN</option>
                             </select>
                         </div>
                     </div>
@@ -101,16 +108,32 @@
             import { inicializarEventosPuntosSugeridos } from "./js/logicaListaDePuntosSugeridos.js";
             import { dibujarListaDeResultados } from "./js/logicaListaDeResultados.js";
             
-            function guardarSeleccion() {
-                var comboFC = document.getElementById("comboFormasCanonicas");
-                var comboGeocoders = document.getElementById("comboGeocoders");
-                var resultadoSeleccion = document.getElementById("resultadoSeleccion");
+            const dibujoGeocoders = ( fc ) => {
+                const comboGeocoders = document.getElementById("comboGeocoders");
+                // Limpiar opciones anteriores del comboGeocoders
+                comboGeocoders.innerHTML = '<option value="0">Seleccione un geocodificador</option>';
+                    
+                // Crear y agregar nuevas opciones al comboGeocoders
+                console.log(fc, typeof(fc), geocoders, "aca", geocoders[fc] );
 
-                var fcTexto = comboFC.options[comboFC.selectedIndex].text;
-                var geocodersTexto = comboGeocoders.options[comboGeocoders.selectedIndex].text;
+                for (const keyGeo in geocoders[fc]) {
+                    const option = document.createElement('option');
+                    option.value = keyGeo;
+                    option.text = geocoders[fc][keyGeo];
+                    comboGeocoders.appendChild(option);
+                }
+            };
 
-                resultadoSeleccion.textContent = fcTexto + " - " + geocodersTexto;
-            }
+            const getQueryParams = ( input ) => {
+                //TRABAJAR CON EL INPUT DEL USUARIO
+                let queryParams = input; 
+
+                return queryParams;
+            };
+
+            const getFCNormalizada = ( fc ) => {
+                return fc.replaceAll(",", ", ");
+            };
 
             //dibujo el mapa e inicializo variables que seran utiles luego
             let mapa = L.map('mapa');
@@ -119,70 +142,86 @@
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png?', {}).addTo(mapa);
 
             //Obtengo componentes
+            const inputAddress = document.getElementById('address');
             const btnBuscar = document.getElementById('btnBuscar');
-
+            const infoConfigAvanzada = document.getElementById("infoConfigAvanzada");
+            
+            //Obtengo componentes Modal configuracion avanzada
             const btnModalGuardar = document.getElementById('btnModalGuardar');
+            const btnModalClose   = document.getElementById('btnModalClose');
             const comboFC = document.getElementById("comboFormasCanonicas");
+            const comboGeocoders = document.getElementById("comboGeocoders");
+            
+            //Obtengo las FC existentes (1 vez sola)
+            const formasCanonicas = await getFCGeoCoders();
+            const keysFC = Object.keys(formasCanonicas);
+            
+            //Obtengo los Geocoders existentes (1 vez sola)
+            let geocoders = {};
+            //Armo un Objeto que tenga todos los geocorders agrupados por FC
+            keysFC.forEach( async( key ) => {
+                const geocodersFC = await getGeoCoders( key );
+                geocoders[ key ] = geocodersFC;
+            });
+            
+            //Dibujo en el modal de config avanzada las FC y Geocoders por default (1 sola vez)
+            keysFC.forEach( ( key ) => {
+                const option = document.createElement('option');
+                
+                option.value = key;
+                option.text = key + ". " + getFCNormalizada( formasCanonicas[key] );
+                //Selecciono la FC por default
+                if ( key === "6"){
+                    option.selected = true;
+                }
+                
+                comboFC.appendChild(option);
+            });
+
+            inputAddress.placeholder = "Buscar por: " + getFCNormalizada( formasCanonicas[6] );
+            infoConfigAvanzada.innerHTML = "Geocoders: Todos";
 
             //Logica de la aplicacion
             inicializarEventosPuntosSugeridos();
             
-            btnModalGuardar.onclick = () => {
-                guardarSeleccion();
-            }
-
             btnBuscar.onclick = async () => {
                 var comboFC = document.getElementById("comboFormasCanonicas").value;
                 var comboGeocoders = document.getElementById("comboGeocoders").value;
                 
-                const resp = await getDireccionEstructurada(comboGeocoders, comboFC, "calle=Lomas de zamora");
-                console.log(resp)
+                let queryParams = getQueryParams( inputAddress.value.trim() );
+                queryParams = "calle=Lomas de zamora"; //pruebas
+
+                const resp = await getDireccionEstructurada(comboGeocoders, comboFC, queryParams);
                 
                 dibujarListaDeResultados(resp);
             }
 
-            btnConfigurarBusqueda.onclick = async () => {
-                const resp = await getFCGeoCoders();
-                listarFormasCanonicas(resp);
-            }
+            btnModalGuardar.onclick = () => {
+                const comboFC = document.getElementById("comboFormasCanonicas");
+                const comboGeocoders = document.getElementById("comboGeocoders");
+                
+                let fcTexto = comboFC.options[comboFC.selectedIndex].text;
+                let geocodersTexto = comboGeocoders.options[comboGeocoders.selectedIndex].text;
 
-            const listarFormasCanonicas = (opcionesFC) => {
-                const selectComboFC = document.getElementById('comboFormasCanonicas');
-
-                // Eliminamos las opciones anteriores
-                selectComboFC.innerHTML = '';
-
-                for (const key in opcionesFC) {
-                    const option = document.createElement('option');
-                    option.value = key;
-                    option.text = opcionesFC[key];
-                    selectComboFC.appendChild(option);
+                if ( comboGeocoders.selectedIndex === 0 ){
+                    geocodersTexto = "Todos";
                 }
-            }
 
+                infoConfigAvanzada.innerHTML = "Geocoders: " + geocodersTexto;
+                inputAddress.placeholder = "Buscar por: " + getFCNormalizada( formasCanonicas[comboFC.value] );
+
+                btnModalClose.click();
+            }
+                       
             // Evento change para el comboFormasCanonicas
             comboFC.addEventListener("change", async function () {
                 const formaCanonica = this.value;
-                const comboGeocoders = document.getElementById("comboGeocoders");
-
-                // Limpiar opciones anteriores del comboGeocoders
-                comboGeocoders.innerHTML = '<option value="">Seleccione un geocodificador</option>';
-
                 if (formaCanonica !== "") {
-                    // Obtener los geocodificadores según la forma canónica seleccionada
-
-                    const geocoders = await getGeoCoders(formaCanonica);
-
-
-                    // Crear y agregar nuevas opciones al comboGeocoders
-                    for (const key in geocoders) {
-                        const option = document.createElement('option');
-                        option.value = key;
-                        option.text = geocoders[key];
-                        comboGeocoders.appendChild(option);
-                    }
+                    dibujoGeocoders( formaCanonica );
                 }
             });
+
+            
 
         </script>
 

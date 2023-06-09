@@ -38,6 +38,7 @@ export const dibujarListaDePuntosSugeridos = ( puntos ) => {
     //Muestro los elementos en el html
     DomListaPuntosSugeridos.innerHTML = htmlPuntosSugeridos.join("");
     DomListaPuntosSugeridos.style.display = 'block';
+    DomListaPuntosSugeridos.classList.add("overflow-y-scroll");
 
     const DomPuntosSugeridos = Array.from(document.getElementsByClassName('geometrySugest'));
     DomPuntosSugeridos.forEach(function( DomPunto) {
