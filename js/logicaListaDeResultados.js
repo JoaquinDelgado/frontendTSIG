@@ -1,5 +1,5 @@
 
-export const dibujarListaDeResultados = ( elementos, mapa ) => {
+export const dibujarListaDeResultados = ( elementos, mapa, markers ) => {
     console.log( elementos );
     
     const listaDeResultados = document.getElementById('listaDeResultados');
@@ -29,13 +29,17 @@ export const dibujarListaDeResultados = ( elementos, mapa ) => {
         let resultado = resultados[i];
 
         resultado.onclick = () => {
+            // Borrar marcadores anteriores
+            markers.clearLayers();
+
             const x = resultado.getAttribute('x');
             const y = resultado.getAttribute('y');
 
-            mapa.setView([y, x], 11);
-            let marcador = L.marker([y, x]).addTo(mapa);
+            // Agregar marcador en la ubicación encontrada
+            L.marker([y, x]).addTo(markers).bindPopup(resultado.innerHTML).openPopup();
 
-            marcador.bindPopup(resultado.innerHTML);
+            // Añadir los marcadores al mapa
+            markers.addTo(mapa);
         };
 
     }

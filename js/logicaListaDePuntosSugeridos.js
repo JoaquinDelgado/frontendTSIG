@@ -3,32 +3,31 @@ import { getPuntosSugeridos } from "./apiGeocoder.js";
 export const inicializarEventosPuntosSugeridos = () => {
     const input = document.getElementById('address');
     const DomListaPuntosSugeridos = document.getElementById('listaPuntosSugereridos');
-        
+
     input.addEventListener('input', async function () {
         const inputValue = this.value.toLowerCase();
         const inputLength = inputValue.length;
 
         if (inputLength > 3) {
-            const puntosSugeridos = await getPuntosSugeridos( inputValue );
+            const puntosSugeridos = await getPuntosSugeridos(inputValue);
 
-            dibujarListaDePuntosSugeridos( puntosSugeridos );
+            dibujarListaDePuntosSugeridos(puntosSugeridos);
         } else {
-            DomListaPuntosSugeridos.style.display = 'none';            
+            DomListaPuntosSugeridos.style.display = 'none';
         }
     });
 
 }
 
-export const dibujarListaDePuntosSugeridos = ( puntos ) => {
+export const dibujarListaDePuntosSugeridos = (puntos) => {
     //Obtengo componentes
     const input = document.getElementById('address');
     const btnBuscar = document.getElementById('btnBuscar');
     const DomListaPuntosSugeridos = document.getElementById('listaPuntosSugereridos');
-
-    console.log(puntos);
-    const htmlPuntosSugeridos = puntos.map( (punto) => {
+    
+    const htmlPuntosSugeridos = puntos.map((punto) => {
         let html = '';
-        html += '<li class="geometry list-group-item d-block">';
+        html += '<li class="geometrySugest list-group-item d-block">';
         html += punto.calle + '<br>';
         html += punto.departamento + ' ' + punto.localidad;
         html += '</li>';
@@ -38,15 +37,16 @@ export const dibujarListaDePuntosSugeridos = ( puntos ) => {
     //Muestro los elementos en el html
     DomListaPuntosSugeridos.innerHTML = htmlPuntosSugeridos.join("");
     DomListaPuntosSugeridos.style.display = 'block';
-
+    DomListaPuntosSugeridos.classList.add("overflow-y-scroll");
     const DomPuntosSugeridos = Array.from(document.getElementsByClassName('geometrySugest'));
-    DomPuntosSugeridos.forEach(function( DomPunto) {
+    
+    DomPuntosSugeridos.forEach( ( DomPunto ) => {
+        DomPunto.addEventListener('click', function () {
+            console.log(this.textContent);
+            input.value = this.textContent;
+            DomListaPuntosSugeridos.style.display = 'none';
 
-        DomPunto.addEventListener('click', function() {
-          input.value = this.textContent;
-          DomListaPuntosSugeridos.style.display = 'none';
-
-          btnBuscar.click();
+            btnBuscar.click();
         });
 
     });

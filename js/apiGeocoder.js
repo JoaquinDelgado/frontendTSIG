@@ -18,7 +18,6 @@ export const getGeoCoders = (idFormaCanonica) => {
     const data = fetch(url)
         .then(response => response.json())
         .then(response => {
-            console.log("lista de geocoders", response)
             return response;
         });
 

@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "addressit": "^1.8.2",
+    "parse-address": "^1.1.2"
+  }
+}
