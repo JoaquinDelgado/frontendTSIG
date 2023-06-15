@@ -78,3 +78,5 @@ var blackIcon = new L.Icon({
 	popupAnchor: [1, -34],
 	shadowSize: [41, 41]
 });
+
+export { blueIcon, goldIcon, redIcon, greenIcon, orangeIcon, yellowIcon, violetIcon, greyIcon, blackIcon }

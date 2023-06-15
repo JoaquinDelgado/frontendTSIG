@@ -1,3 +1,4 @@
+import { dibujarMarker } from "./logicaMapa.js";
 
 export const dibujarListaDeResultados = ( elementos, mapa, markers ) => {
     console.log( elementos );
@@ -5,15 +6,11 @@ export const dibujarListaDeResultados = ( elementos, mapa, markers ) => {
     const listaDeResultados = document.getElementById('listaDeResultados');
 
     const htmlElementos = elementos.map((elem) => {
-        let nroPuerta = '';
-        if (elem.direccion.numero && elem.direccion.numero.nro_puerta) {
-            nroPuerta = elem.direccion.numero.nro_puerta;
-        } 
-        
         let html = '';
-        html = '<button type="button" class="geometry list-group-item list-group-item-action" x="' + elem.puntoX + '" y="' + elem.puntoY + '">';
-        html += elem.direccion.calle?.nombre_normalizado + ' ' + nroPuerta + '<br>';
-        html += elem.direccion.departamento.nombre_normalizado;
+        html = '<button type="button" class="geometry list-group-item list-group-item-action" x="' + elem.latitud + '" y="' + elem.longitud + '">';
+        html += elem.nombreNormalizado + '<br>';
+        html += elem.localidad + ' ' + elem.departamento + '<br>';
+        html += 'Geocoders: ' + elem.geoCoder;
         html += '</button>';
 
         return html;
@@ -29,27 +26,20 @@ export const dibujarListaDeResultados = ( elementos, mapa, markers ) => {
         let resultado = resultados[i];
 
         resultado.onclick = () => {
-            // Borrar marcadores anteriores
-            markers.clearLayers();
-
             const x = resultado.getAttribute('x');
             const y = resultado.getAttribute('y');
 
-            // Agregar marcador en la ubicación encontrada
-            var redIcon = new L.Icon({
-                iconUrl: 'img/marker-icon-2x-red.png',
-                shadowUrl: 'img/marker-shadow.png',
-                iconSize: [25, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-                shadowSize: [41, 41]
-            });
-            
-            L.marker([y, x], { icon: redIcon }).addTo(markers).bindPopup(resultado.innerHTML).openPopup();
-            
+            let punto = {
+                "latitud": x,
+                "longitud": y,
+                "textoPopup": resultado.innerHTML,
+                "mapa": mapa,
+                "markers": markers,
+            };
 
-            // Añadir los marcadores al mapa
-            markers.addTo(mapa);
+            // Borrar marcadores anteriores
+            markers.clearLayers();
+            dibujarMarker( punto );
         };
 
     }
