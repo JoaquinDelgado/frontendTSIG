@@ -36,7 +36,17 @@ export const dibujarListaDeResultados = ( elementos, mapa, markers ) => {
             const y = resultado.getAttribute('y');
 
             // Agregar marcador en la ubicación encontrada
-            L.marker([y, x]).addTo(markers).bindPopup(resultado.innerHTML).openPopup();
+            var redIcon = new L.Icon({
+                iconUrl: 'img/marker-icon-2x-red.png',
+                shadowUrl: 'img/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            });
+            
+            L.marker([y, x], { icon: redIcon }).addTo(markers).bindPopup(resultado.innerHTML).openPopup();
+            
 
             // Añadir los marcadores al mapa
             markers.addTo(mapa);
