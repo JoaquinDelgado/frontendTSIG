@@ -48,9 +48,9 @@ export const getFCGeoCoders = () => {
 }
 
 export const getDireccionEstructurada = (idGeoCoder, idFormaCanonica, intputDir) => {
-    const paramBuscar = intputDir //FIXME parsear lo ingresado con la forma canónica
-    // const url = backend + '/busquedaDireccionEstructurada/' + idGeoCoder + '/' + idFormaCanonica + '?' + paramBuscar;
-    const url = backend + '/busquedaDireccionEstructurada/1/1?' + paramBuscar;
+    const paramBuscar = intputDir 
+    const url = backend + '/busquedaDireccionEstructurada/' + idGeoCoder + '/' + idFormaCanonica + '?' + paramBuscar;
+    //const url = backend + '/busquedaDireccionEstructurada/1/1?' + paramBuscar;
     const data = fetch(url)
         .then(response => response.json())
         .then(response => {

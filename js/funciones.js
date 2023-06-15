@@ -52,7 +52,26 @@ const makeHttpQueryParams = ( direccion ) => {
 }
 
 const makeQueryParamsFC1 = ( input ) => {
-  console.log('soy la FC 1');
+  //FIXME: COmpletar con el parseo restante
+  let splitInput = input.split(" ");
+
+  //Controlo errores
+  //Solo ingreso un nro o una calle o escribio todo pegado sin espacios
+  if ( splitInput.length <= 1 ){ 
+    throw new Error( 'Formato de dirección incorrecto' );
+  }
+
+  //Busco primero el nro
+  const indexNro = splitInput.length - 1;
+  const nro = splitInput[ indexNro ];
+  //El resto es la calle
+  splitInput.splice(indexNro, 1); //elimino el nro del array
+  const calle = splitInput.join(" "); //vuelvo a formar la calle
+
+  //Ahora que tengo los parametros construyo el httpQueryParams
+  const httpQueryParams = makeHttpQueryParams( {"calle": calle, "numero": nro} );
+  
+  return httpQueryParams;
 };
 
 const makeQueryParamsFC2 = ( input ) => {
@@ -69,6 +88,35 @@ const makeQueryParamsFC4 = ( input ) => {
 
 const makeQueryParamsFC5 = ( input ) => {
   console.log('soy la FC 5');
+  let splitInput = input.split(" ");
+
+  //Controlo errores
+  //Solo ingreso un km o una ruta o escribio todo pegado sin espacios
+  if ( splitInput.length <= 1 ){ 
+    throw new Error( 'Formato de dirección incorrecto' );
+  }
+
+  var numeroRuta = null;
+  var kilometro = null;
+
+  // Eliminar caracteres especiales y convertir a minúsculas para simplificar el análisis
+  var direccionNormalizada = input.toLowerCase().replace(/[áéíóú]/g, function(match) {
+    return 'aeiou'['áéíóú'.indexOf(match)];
+  });
+
+  // Expresión regular para buscar el número de ruta y el kilómetro
+  var regex = /ruta\s*(\d+)\s*(km|kilometro)\s*(\d+)/;
+  var matches = direccionNormalizada.match(regex);
+
+  if (matches && matches.length >= 4) {
+    numeroRuta = matches[1];
+    kilometro = matches[3];
+  }
+
+  //Ahora que tengo los parametros construyo el httpQueryParams
+  const httpQueryParams = makeHttpQueryParams( {"numeroRuta": numeroRuta, "kilometro": kilometro} );
+  
+  return httpQueryParams;
 };
 
 const makeQueryParamsFC6 = ( input ) => {
