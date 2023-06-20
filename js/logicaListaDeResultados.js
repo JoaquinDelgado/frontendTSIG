@@ -1,46 +1,51 @@
-import { dibujarMarker } from "./logicaMapa.js";
+import { dibujarMarkers } from "./logicaMapa.js";
 
 export const dibujarListaDeResultados = ( elementos, mapa, markers ) => {
-    console.log( elementos );
-    
     const listaDeResultados = document.getElementById('listaDeResultados');
+    listaDeResultados.innerHTML = '';
+    
+    elementos.forEach( elem => {
+        const puntoBtn = document.createElement('button');
 
-    const htmlElementos = elementos.map((elem) => {
-        let html = '';
-        html = '<button type="button" class="geometry list-group-item list-group-item-action" x="' + elem.latitud + '" y="' + elem.longitud + '">';
-        html += elem.nombreNormalizado + '<br>';
-        html += elem.localidad + ' ' + elem.departamento + '<br>';
-        html += 'Geocoders: ' + elem.geoCoder;
-        html += '</button>';
+        puntoBtn.className = "geometry list-group-item list-group-item-action";
+        puntoBtn.innerHTML += '<p class="m-0 mb-1 p-0" style="font-size: 0.9rem;">' + elem.nombreNormalizado + '</p>';
+        
+        puntoBtn.addEventListener('click', () => {
+            
+            let puntos = [];
+            elem.geoCoders.forEach( geocoder => {
+                elem[geocoder].nombreNormalizado = elem.nombreNormalizado;
+                elem[geocoder].departamento = elem.departamento;
+                elem[geocoder].geocoder = geocoder;
+                
+                puntos.push( elem[geocoder] );
+            });
 
-        return html;
-    });
-    //Muestro los elementos en el html
-    listaDeResultados.innerHTML = htmlElementos.join("");
-    listaDeResultados.classList.add("overflow-y-scroll");
-
-    //seteo los eventos clicks de cada resultado
-    const resultados = document.getElementsByClassName('geometry');
-
-    for (let i = 0; i < resultados.length; i++) {
-        let resultado = resultados[i];
-
-        resultado.onclick = () => {
-            const x = resultado.getAttribute('x');
-            const y = resultado.getAttribute('y');
-
-            let punto = {
-                "latitud": x,
-                "longitud": y,
-                "textoPopup": resultado.innerHTML,
-                "mapa": mapa,
-                "markers": markers,
-            };
-
-            // Borrar marcadores anteriores
+            //Borrar marcadores anteriores
             markers.clearLayers();
-            dibujarMarker( punto );
-        };
+            dibujarMarkers( puntos, mapa, markers );
+            
+        });
+        //utilizo bootstrap para alinear
+        const divCol61 = document.createElement('div');
+        divCol61.className = "col-6";
+        divCol61.style = "font-size: 0.8rem;";
+        divCol61.innerHTML = elem.departamento;
+        
+        const divCol62 = document.createElement('div');
+        divCol62.className = "col-6 text-end";
+        divCol62.style = "font-size: 0.8rem;";
+        divCol62.innerHTML = 'Geocoders: ' + elem.geoCoders.join(", ");
+        
+        const divRow = document.createElement('div');
+        divRow.className = "row align-items-center";
+        divRow.appendChild(divCol61);
+        divRow.appendChild(divCol62);
+        
+        puntoBtn.appendChild(divRow);
 
-    }
+        //Agrego el boton a la lista de resultados
+        listaDeResultados.appendChild(puntoBtn);
+    });
+
 }

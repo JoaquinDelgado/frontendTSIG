@@ -25,9 +25,7 @@ export const getGeoCoders = (idFormaCanonica) => {
 }
 
 export const getPuntosSugeridos = (input) => {
-    //const data = ['Fernandez crespo', 'Freire 129', 'Jose B. Freire 129'];
-
-    const url = backend + '/sugerenciaCalleCompleta?entrada=' + input;
+    const url = backend + '/sugerenciaCalleCompleta?todos=true&entrada=' + input;
     const data = fetch( url )
         .then( response => response.json() )
         .then( response => {
