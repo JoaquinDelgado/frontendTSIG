@@ -40,6 +40,9 @@ export const getFCGeoCoders = () => {
     const data = fetch(url)
         .then(response => response.json())
         .then(response => {
+
+            //Agrego la Forma reversa
+            response["7"] = "latitud, longitud (reverse geocoding)";
             return response;
         });
     return data;
@@ -48,6 +51,18 @@ export const getFCGeoCoders = () => {
 export const getDireccionEstructurada = (idGeoCoder, idFormaCanonica, paramBuscar) => {
     const url = backend + '/busquedaDireccionEstructurada/' + idGeoCoder + '/' + idFormaCanonica + '?' + paramBuscar;
     //const url = backend + '/busquedaDireccionEstructurada/1/1?' + paramBuscar;
+    const data = fetch(url)
+        .then(response => response.json())
+        .then(response => {
+            return response;
+        });
+    return data;
+
+}
+
+export const getReverseGeocoding = ( paramBuscar) => {
+    const url = backend + '/reverse?' + paramBuscar;
+
     const data = fetch(url)
         .then(response => response.json())
         .then(response => {

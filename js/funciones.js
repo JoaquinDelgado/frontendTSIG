@@ -1,7 +1,7 @@
 import { esDepartamento, esLocalidad } from "./departamentosLocalidades.js";
 
 export const getFCNormalizada = (fc) => {
-  return fc.replaceAll(",", ", ");
+  return fc.replaceAll(",", " ");
 };
 
 export const getHttpQueryParams = (fc, input) => {
@@ -13,6 +13,7 @@ export const getHttpQueryParams = (fc, input) => {
     ["4", makeQueryParamsFC4],
     ["5", makeQueryParamsFC5],
     ["6", makeQueryParamsFC6],
+    ["7", makeQueryParamsFC7],
   ]);
 
   if ( !makeQueryParams.has( fc ) ){
@@ -39,6 +40,8 @@ export const getHttpQueryParams = (fc, input) => {
 // nombreInmueble
 // numeroRuta
 // kilometro
+// latitud
+// longitud
 const makeHttpQueryParams = ( direccion ) => {
   let queryParams = '';
   let separador = '';
@@ -137,6 +140,24 @@ const makeQueryParamsFC6 = ( input ) => {
 
   //Ahora que tengo los parametros construyo el httpQueryParams
   const httpQueryParams = makeHttpQueryParams( {"calle": calle, "numero": nro} );
+  
+  return httpQueryParams;
+};
+
+const makeQueryParamsFC7 = ( input ) => {
+  let splitInput = input.split(" ");
+
+  //Controlo errores
+  if ( splitInput.length != 2 ){ 
+    throw new Error( 'Formato latitud longitud incorrecto' );
+  }
+
+  //Busco primero el nro
+  const lat = splitInput[ splitInput.length - 2 ];
+  const lon = splitInput[ splitInput.length - 1 ];
+  
+  //Ahora que tengo los parametros construyo el httpQueryParams
+  const httpQueryParams = makeHttpQueryParams( {"latitud": lat, "longitud": lon} );
   
   return httpQueryParams;
 };

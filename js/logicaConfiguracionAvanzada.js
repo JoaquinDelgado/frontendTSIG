@@ -48,20 +48,18 @@ export const inicializarConfiguracionAvanzada = async( formasCanonicas ) => {
         comboFC.appendChild(option);
     });
 
-    inputAddress.placeholder = "Buscar por: " + getFCNormalizada(formasCanonicas[6]);
-    infoConfigAvanzada.innerHTML = "Geocoders: Todos";
+    infoConfigAvanzada.innerHTML = "FC: " + getFCNormalizada(formasCanonicas[6]) + " <br> Geocoders: Todos";
 
     btnModalGuardar.onclick = () => {
-        let fcTexto = comboFC.options[comboFC.selectedIndex].text;
+        let fcTexto =  getFCNormalizada(formasCanonicas[comboFC.value]);
         let geocodersTexto = comboGeocoders.options[comboGeocoders.selectedIndex].text;
 
         if (comboGeocoders.selectedIndex === 0) {
             geocodersTexto = "Todos";
         }
 
-        infoConfigAvanzada.innerHTML = "Geocoders: " + geocodersTexto;
-        inputAddress.placeholder = "Buscar por: " + getFCNormalizada(formasCanonicas[comboFC.value]);
-
+        infoConfigAvanzada.innerHTML = "FC: " + fcTexto + " <br> Geocoders: " + geocodersTexto;
+        
         btnModalClose.click();
     }
 

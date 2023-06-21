@@ -74,10 +74,10 @@
 
                                     <div style="font-size: 0.75rem;" class="m-1">
                                         <div class="row">
-                                            <div class="col-6">
+                                            <div class="col-8">
                                                 <span id="infoConfigAvanzada" class="text-secondary mt-1 mb-3"></span>
                                             </div>
-                                            <div class="col-6 text-end">
+                                            <div class="col-4 text-end">
                                                 <a href="#" id="btnConfigurarBusqueda"
                                                     class="link-secondary link-underline link-underline-opacity-0 link-underline-opacity-75-hover"
                                                     data-bs-toggle="modal" data-bs-target="#staticBackdrop">
@@ -114,7 +114,49 @@
             <!-- ANALISIS -->
             <div class="tab-pane fade" id="analisis-tab-pane" role="tabpanel" aria-labelledby="analisis-tab"
                 tabindex="0">
-                Pestaña de analisis de datos de BD
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Heading</th>
+                                <th scope="col">Heading</th>
+                                <th scope="col">Heading</th>
+                                <th scope="col">Heading</th>
+                                <th scope="col">Heading</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row">1</th>
+                                <td>Cell</td>
+                                <td>Cell</td>
+                                <td>Cell</td>
+                                <td>Cell</td>
+                                <td>Cell</td>
+
+                            </tr>
+                            <tr>
+                                <th scope="row">2</th>
+                                <td>Cell</td>
+                                <td>Cell</td>
+                                <td>Cell</td>
+                                <td>Cell</td>
+                                <td>Cell</td>
+
+                            </tr>
+                            <tr>
+                                <th scope="row">3</th>
+                                <td>Cell</td>
+                                <td>Cell</td>
+                                <td>Cell</td>
+                                <td>Cell</td>
+                                <td>Cell</td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
         </div>
@@ -158,7 +200,7 @@
             </script>
 
         <script type="module">
-            import { getDataGeocoder, getDireccionEstructurada, getFCGeoCoders } from "./js/apiGeocoder.js";
+            import { getDataGeocoder, getDireccionEstructurada, getFCGeoCoders, getReverseGeocoding } from "./js/apiGeocoder.js";
             import { inicializarEventosPuntosSugeridos } from "./js/logicaListaDePuntosSugeridos.js";
             import { dibujarListaDeResultados } from "./js/logicaListaDeResultados.js";
             import { inicializarConfiguracionAvanzada } from "./js/logicaConfiguracionAvanzada.js";
@@ -167,8 +209,7 @@
             //Obtengo componentes
             const inputAddress = document.getElementById('address');
             const btnBuscar = document.getElementById('btnBuscar');
-            const infoConfigAvanzada = document.getElementById("infoConfigAvanzada");
-
+            
             //Logica de la aplicacion
             //Obtengo las FC existentes (1 vez sola)
             const formasCanonicas = await getFCGeoCoders();
@@ -193,39 +234,12 @@
 
                 let queryParams = getHttpQueryParams(idFc, inputAddress.value.trim());
 
-                //const resp = await getDireccionEstructurada(idGeocoder, idFc, queryParams);
-                const resp = [
-                    {
-
-                        "geoCoders": ["IDE", "Photon"],
-                        "nombreNormalizado": "JOSE B. FREIRE 129",
-                        "departamento": "MONTEVIDEO",
-
-                        "IDE": {
-                            "localidad": "MONTEVIDEO",
-                            "codigoPostal": 11900,
-                            "latitud": -34.854495387858634,
-                            "longitud": -56.21921410496764
-                        },
-                        "Photon": {
-                            "localidad": "MONTEVIDEO",
-                            "codigoPostal": 11900,
-                            "latitud": -34.854495387858634 - 0.001,
-                            "longitud": -56.21921410496764
-                        }
-
-                    },
-                    {
-                        "geoCoders": ["NOMINATIM"],
-                        "nombreNormalizado": "127,129, José B. Freire, Belvedere, Montevideo, 11700, Uruguay",
-                        "departamento": "MONTEVIDEO",
-                        "NOMINATIM": {
-                            "localidad": null,
-                            "codigoPostal": null,
-                            "latitud": -34.8544928,
-                            "longitud": -56.2192167
-                        }
-                    }];
+                let resp = [];
+                if ( idFc == "7" ){
+                    resp= await getReverseGeocoding( queryParams );
+                } else {
+                    resp = await getDireccionEstructurada(idGeocoder, idFc, queryParams);
+                }
 
                 dibujarListaDeResultados(resp, mapa, markers);
             }
