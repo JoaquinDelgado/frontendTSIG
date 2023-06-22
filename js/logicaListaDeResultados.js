@@ -23,6 +23,7 @@ export const dibujarListaDeResultados = (elementos, mapa, markers) => {
                     elem[geocoder].geocoder = geocoder;
 
                     puntos.push(elem[geocoder]);
+
                 });
 
                 //Borrar marcadores anteriores
