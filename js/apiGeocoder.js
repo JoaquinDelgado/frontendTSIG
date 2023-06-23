@@ -41,10 +41,27 @@ export const getFCGeoCoders = () => {
         .then(response => response.json())
         .then(response => {
 
-            //Agrego la Forma reversa
+            //Agrego la  Forma reversa
             response["7"] = "latitud, longitud (reverse geocoding)";
             return response;
+        })
+        .catch( ( error ) => {
+            //Si falla la conexion con el backend seteamos los geocoders nosotros
+            console.log( 'No se pudo conectar con el backend. Error: ' + error);
+            
+            const response = {
+                "1": "calle,numero,localidad,departamento",
+                "2": "calle,numero,calle2,localidad,departamento",
+                "3": "calle,manzana,solar,localidad,departamento",
+                "4": "nombreInmueble,departamento",
+                "5": "numeroRuta,kilometro",
+                "6": "calle,numero",
+                "7": "latitud, longitud (reverse geocoding)"
+            }
+                        
+            return response;
         });
+
     return data;
 }
 
@@ -66,8 +83,38 @@ export const getReverseGeocoding = ( paramBuscar) => {
     const data = fetch(url)
         .then(response => response.json())
         .then(response => {
+            console.log( response );
             return response;
+        })
+        .catch( (err) => {
+            console.log('Error en reverse geocoding. ERROR:' + err);
         });
+
+    return data;
+
+}
+
+export const getDirEnPoligo = ( poligono ) => {
+    
+    const url = backend + '/direcEnPoligono';
+    const dataSend = {
+        "poligono": poligono
+    };
+
+    const data = fetch(url, {
+            method: "POST",
+            body: JSON.stringify(dataSend),
+            headers: {"Content-Type": "application/json"},
+            credentials: "same-origin"
+        })
+        .then(response => response.json())
+        .then(response => {
+            return response;
+        })
+        .catch( (err) => {
+            console.log('Error al obtener el poligono. ERROR:' + err);
+        });
+
     return data;
 
 }

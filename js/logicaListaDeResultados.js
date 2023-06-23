@@ -10,18 +10,20 @@ export const dibujarListaDeResultados = (elementos, mapa, markers) => {
     } else {
         elementos.forEach(elem => {
             const puntoBtn = document.createElement('button');
-
+            
             puntoBtn.className = "geometry list-group-item list-group-item-action";
             puntoBtn.innerHTML += '<p class="m-0 mb-1 p-0" style="font-size: 0.9rem;">' + elem.nombreNormalizado + '</p>';
 
             puntoBtn.addEventListener('click', () => {
-
+                
                 let puntos = [];
                 elem.geoCoders.forEach(geocoder => {
+
+                    geocoder = geocoder.toLowerCase();
                     elem[geocoder].nombreNormalizado = elem.nombreNormalizado;
                     elem[geocoder].departamento = elem.departamento;
                     elem[geocoder].geocoder = geocoder;
-
+                    
                     puntos.push(elem[geocoder]);
 
                 });

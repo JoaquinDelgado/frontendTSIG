@@ -99,12 +99,12 @@ export const getMapa = (callbackDrawMarker, callbackDrawRectangle) => {
 
         if (layer instanceof L.Rectangle) {
             const bounds = layer.getBounds();
-            const rectangleVertices = [
-                bounds.getNorthWest(), // Vértice superior izquierdo
-                bounds.getNorthEast(), // Vértice superior derecho
-                bounds.getSouthEast(), // Vértice inferior derecho
-                bounds.getSouthWest()  // Vértice inferior izquierdo
-            ];
+            const rectangleVertices = {
+                "northwest": bounds.getNorthWest(), // Vértice superior izquierdo
+                "northeast": bounds.getNorthEast(), // Vértice superior derecho
+                "souteast": bounds.getSouthEast(), // Vértice inferior derecho
+                "soutwest": bounds.getSouthWest()  // Vértice inferior izquierdo
+            };
             callbackDrawRectangle(rectangleVertices);
         }
 

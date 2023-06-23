@@ -14,6 +14,12 @@ const dibujoGeocoders = (fc, geocoders) => {
     }
 };
 
+export const setInfoConfigAvanzada = ( fc, geocodersTexto ) => {
+    const infoConfigAvanzada = document.getElementById("infoConfigAvanzada");
+    
+    infoConfigAvanzada.innerHTML = "FC: " + getFCNormalizada(fc) + " <br> Geocoders: " + geocodersTexto;
+};
+
 export const inicializarConfiguracionAvanzada = async( formasCanonicas ) => {
 
     //Obtengo componentes Modal configuracion avanzada
@@ -21,8 +27,6 @@ export const inicializarConfiguracionAvanzada = async( formasCanonicas ) => {
     const btnModalClose = document.getElementById('btnModalClose');
     const comboFC = document.getElementById("comboFormasCanonicas");
     const comboGeocoders = document.getElementById("comboGeocoders");    
-    const inputAddress = document.getElementById('address');
-    const infoConfigAvanzada = document.getElementById("infoConfigAvanzada");
 
     const keysFC = Object.keys(formasCanonicas);
 
@@ -47,19 +51,17 @@ export const inicializarConfiguracionAvanzada = async( formasCanonicas ) => {
 
         comboFC.appendChild(option);
     });
-
-    infoConfigAvanzada.innerHTML = "FC: " + getFCNormalizada(formasCanonicas[6]) + " <br> Geocoders: Todos";
-
+    setInfoConfigAvanzada( formasCanonicas[6], "Todos" );
+    
     btnModalGuardar.onclick = () => {
-        let fcTexto =  getFCNormalizada(formasCanonicas[comboFC.value]);
         let geocodersTexto = comboGeocoders.options[comboGeocoders.selectedIndex].text;
 
         if (comboGeocoders.selectedIndex === 0) {
             geocodersTexto = "Todos";
         }
 
-        infoConfigAvanzada.innerHTML = "FC: " + fcTexto + " <br> Geocoders: " + geocodersTexto;
-        
+        setInfoConfigAvanzada( formasCanonicas[comboFC.value], geocodersTexto );
+
         btnModalClose.click();
     }
 

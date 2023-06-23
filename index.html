@@ -209,10 +209,10 @@
             </script>
 
         <script type="module">
-            import { getDataGeocoder, getDireccionEstructurada, getFCGeoCoders, getReverseGeocoding } from "./js/apiGeocoder.js";
+            import { getDirEnPoligo, getDataGeocoder, getDireccionEstructurada, getFCGeoCoders, getReverseGeocoding } from "./js/apiGeocoder.js";
             import { inicializarEventosPuntosSugeridos } from "./js/logicaListaDePuntosSugeridos.js";
             import { dibujarListaDeResultados } from "./js/logicaListaDeResultados.js";
-            import { inicializarConfiguracionAvanzada } from "./js/logicaConfiguracionAvanzada.js";
+            import { inicializarConfiguracionAvanzada,setInfoConfigAvanzada } from "./js/logicaConfiguracionAvanzada.js";
             import { getHttpQueryParams } from "./js/funciones.js";
             import { getMapa } from "./js/logicaMapa.js";
 
@@ -225,10 +225,20 @@
             const formasCanonicas = await getFCGeoCoders();
             const setCoordenadasDesdeMarker = (punto) => {
                 inputAddress.value = punto.lat + " " + punto.lng;
+
+                //seteo forma canonica 7
+                const comboFC = document.getElementById("comboFormasCanonicas");
+                comboFC.value = "7";
+                
+                setInfoConfigAvanzada( formasCanonicas[7], "Todos" );
+
+                btnBuscar.click();
             }
 
             const setCoordenadasDesdeRectangulo = (rectangulo) => {
-                console.log('rectangulo', rectangulo);
+                const polygon = [ rectangulo.northwest,rectangulo.northeast, rectangulo.souteast,rectangulo.soutwest ];
+                
+                const resp = getDirEnPoligo( polygon );
             }
 
             //Inicializaciones
