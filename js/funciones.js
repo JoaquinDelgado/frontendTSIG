@@ -90,7 +90,6 @@ const makeQueryParamsFC4 = ( input ) => {
 };
 
 const makeQueryParamsFC5 = ( input ) => {
-  console.log('soy la FC 5');
   let splitInput = input.split(" ");
 
   //Controlo errores

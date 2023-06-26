@@ -4,35 +4,41 @@ export const dibujarListaDeResultados = (elementos, mapa, markers) => {
     const listaDeResultados = document.getElementById('listaDeResultados');
     listaDeResultados.innerHTML = '';
     listaDeResultados.classList.remove("overflow-y-scroll");
-
+    
     if (!elementos) {
-        console.log('No vinieron resultados')
+        console.log('No vinieron resultados');
     } else {
+        listaDeResultados.classList.add("overflow-y-scroll"); //para poder hacer scroll en la lista de resultados
+
+        let todosLosPuntos = [];
         elementos.forEach(elem => {
+
+            let puntos = [];
+            elem.geoCoders.forEach(geocoder => {
+
+                geocoder = geocoder.toLowerCase();
+                elem[geocoder].nombreNormalizado = elem.nombreNormalizado;
+                elem[geocoder].departamento = elem.departamento;
+                elem[geocoder].geocoder = geocoder;
+                
+                puntos.push(elem[geocoder]);
+            });
+
+            //Cargo los puntos para mostrarlos en el mapa todos juntos
+            todosLosPuntos.push(...puntos);
+
+            //Armo una lista de resultados por si quiere ver un punto en particular
             const puntoBtn = document.createElement('button');
             
             puntoBtn.className = "geometry list-group-item list-group-item-action";
             puntoBtn.innerHTML += '<p class="m-0 mb-1 p-0" style="font-size: 0.9rem;">' + elem.nombreNormalizado + '</p>';
 
             puntoBtn.addEventListener('click', () => {
-                
-                let puntos = [];
-                elem.geoCoders.forEach(geocoder => {
-
-                    geocoder = geocoder.toLowerCase();
-                    elem[geocoder].nombreNormalizado = elem.nombreNormalizado;
-                    elem[geocoder].departamento = elem.departamento;
-                    elem[geocoder].geocoder = geocoder;
-                    
-                    puntos.push(elem[geocoder]);
-
-                });
-
                 //Borrar marcadores anteriores
                 markers.clearLayers();
                 dibujarMarkers(puntos, mapa, markers);
-
             });
+
             //utilizo bootstrap para alinear
             const divCol61 = document.createElement('div');
             divCol61.className = "col-6";
@@ -54,8 +60,11 @@ export const dibujarListaDeResultados = (elementos, mapa, markers) => {
             //Agrego el boton a la lista de resultados
             listaDeResultados.appendChild(puntoBtn);
         });
-
-        listaDeResultados.classList.add("overflow-y-scroll");
+        
+        //Dibujo todos los puntos que obtuve del resultado
+        //Borrar marcadores anteriores
+        markers.clearLayers();
+        dibujarMarkers(todosLosPuntos, mapa, markers);
     }
 
 }

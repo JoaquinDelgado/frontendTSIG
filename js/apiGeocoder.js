@@ -83,7 +83,6 @@ export const getReverseGeocoding = ( paramBuscar) => {
     const data = fetch(url)
         .then(response => response.json())
         .then(response => {
-            console.log( response );
             return response;
         })
         .catch( (err) => {
@@ -117,4 +116,19 @@ export const getDirEnPoligo = ( poligono ) => {
 
     return data;
 
+}
+
+export const getDataAnalisis = () => {
+    const url = backend + '/obtenerDatosDeEstudio';
+
+    const data = fetch(url)
+        .then(response => response.json())
+        .then(response => {
+            return response;
+        })
+        .catch( (err) => {
+            console.log('Error en obtener datos de estudio. ERROR:' + err);
+        });
+
+    return data;
 }

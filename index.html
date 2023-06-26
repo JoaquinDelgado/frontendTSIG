@@ -126,43 +126,19 @@
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Heading</th>
-                                <th scope="col">Heading</th>
-                                <th scope="col">Heading</th>
-                                <th scope="col">Heading</th>
-                                <th scope="col">Heading</th>
+                            <tr class="text-center">
+                                <th scope="col" class="text-start">IM - Dirección</th>
+                                <th scope="col">IM - Latitud</th>
+                                <th scope="col">IM - Longitud</th>
+                                <th scope="col">Geocoder</th>
+                                <th scope="col">Dirección geocoder</th>
+                                <th scope="col">Latitud</th>
+                                <th scope="col">Longitud</th>
+                                <th scope="col">Distancia (metros)</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <th scope="row">1</th>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-
-                            </tr>
-                            <tr>
-                                <th scope="row">2</th>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-
-                            </tr>
-                            <tr>
-                                <th scope="row">3</th>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-
-                            </tr>
+                        <tbody id="resultadosAnalisis">
+                            
                         </tbody>
                     </table>
                 </div>
@@ -193,6 +169,7 @@
                                 <option value="0">Seleccione un geocodificador</option>
                                 <option value="1">IDE</option>
                                 <option value="2">NOMINATIN</option>
+                                <option value="3">PHOTON</option>
                             </select>
                         </div>
                     </div>
@@ -209,37 +186,43 @@
             </script>
 
         <script type="module">
-            import { getDirEnPoligo, getDataGeocoder, getDireccionEstructurada, getFCGeoCoders, getReverseGeocoding } from "./js/apiGeocoder.js";
+            import * as Api from "./js/apiGeocoder.js";
             import { inicializarEventosPuntosSugeridos } from "./js/logicaListaDePuntosSugeridos.js";
             import { dibujarListaDeResultados } from "./js/logicaListaDeResultados.js";
-            import { inicializarConfiguracionAvanzada,setInfoConfigAvanzada } from "./js/logicaConfiguracionAvanzada.js";
-            import { getHttpQueryParams } from "./js/funciones.js";
+            import { inicializarConfiguracionAvanzada, setInfoConfigAvanzada } from "./js/logicaConfiguracionAvanzada.js";
+            import * as Funciones from "./js/funciones.js";
             import { getMapa } from "./js/logicaMapa.js";
 
             //Obtengo componentes
             const inputAddress = document.getElementById('address');
             const btnBuscar = document.getElementById('btnBuscar');
+            const analisisTab = document.getElementById('analisis-tab');
 
-            //Logica de la aplicacion
-            //Obtengo las FC existentes (1 vez sola)
-            const formasCanonicas = await getFCGeoCoders();
+            //Funciones auxiliares
             const setCoordenadasDesdeMarker = (punto) => {
+                const inputAddress = document.getElementById('address');
                 inputAddress.value = punto.lat + " " + punto.lng;
 
                 //seteo forma canonica 7
                 const comboFC = document.getElementById("comboFormasCanonicas");
                 comboFC.value = "7";
-                
-                setInfoConfigAvanzada( formasCanonicas[7], "Todos" );
+
+                setInfoConfigAvanzada(formasCanonicas[7], "Todos");
 
                 btnBuscar.click();
             }
 
-            const setCoordenadasDesdeRectangulo = (rectangulo) => {
-                const polygon = [ rectangulo.northwest,rectangulo.northeast, rectangulo.souteast,rectangulo.soutwest ];
-                
-                const resp = getDirEnPoligo( polygon );
+            const setCoordenadasDesdeRectangulo = async (rectangulo) => {
+                const polygon = [rectangulo.northwest, rectangulo.northeast, rectangulo.souteast, rectangulo.soutwest];
+
+                const resp = await Api.getDirEnPoligo(polygon);
+
+                dibujarListaDeResultados(resp, mapa, markers);                
             }
+
+            //Logica de la aplicacion
+            //Obtengo las FC existentes (1 vez sola)
+            const formasCanonicas = await Api.getFCGeoCoders();
 
             //Inicializaciones
             inicializarConfiguracionAvanzada(formasCanonicas);
@@ -251,20 +234,69 @@
                 const DomListaPuntosSugeridos = document.getElementById('listaPuntosSugereridos');
                 DomListaPuntosSugeridos.style.display = 'none';
 
-                var idFc = document.getElementById("comboFormasCanonicas").value;
-                var idGeocoder = document.getElementById("comboGeocoders").value;
+                let idFc = document.getElementById("comboFormasCanonicas").value;
+                let idGeocoder = document.getElementById("comboGeocoders").value;
 
-                let queryParams = getHttpQueryParams(idFc, inputAddress.value.trim());
+                let queryParams = Funciones.getHttpQueryParams(idFc, inputAddress.value.trim());
 
                 let resp = [];
                 if (idFc == "7") {
-                    resp = await getReverseGeocoding(queryParams);
+                    resp = await Api.getReverseGeocoding(queryParams);
                 } else {
-                    resp = await getDireccionEstructurada(idGeocoder, idFc, queryParams);
+                    resp = await Api.getDireccionEstructurada(idGeocoder, idFc, queryParams);
                 }
-
+                
                 dibujarListaDeResultados(resp, mapa, markers);
-            }
+            };
+
+            analisisTab.onclick = async () => {
+                let resp = await Api.getDataAnalisis();
+
+                console.log(resp);
+                let resultadosAnalisis = document.getElementById("resultadosAnalisis");
+                resultadosAnalisis.innerHTML = '';
+                
+                resp.forEach( data => {
+                    const tr = document.createElement('tr');
+
+                    const td1 = document.createElement('td');
+                    td1.innerHTML = data.direccionIM;
+
+                    const td2 = document.createElement('td');
+                    td2.innerHTML = data.latitudIM;
+
+                    const td3 = document.createElement('td');
+                    td3.innerHTML = data.longitudIM;
+
+                    const td4 = document.createElement('td');
+                    td4.className = "text-center";
+                    td4.innerHTML = data.geocoder;
+
+                    const td5 = document.createElement('td');
+                    td5.innerHTML = data.direccionGeocoder;
+
+                    const td6 = document.createElement('td');
+                    td6.innerHTML = data.latitudGeocoder;
+
+                    const td7 = document.createElement('td');
+                    td7.innerHTML = data.longitudGeocoder;
+
+                    const td8 = document.createElement('td');
+                    td8.innerHTML = data.distanciaMetros;
+
+                    tr.appendChild(td1);
+                    tr.appendChild(td2);
+                    tr.appendChild(td3);
+                    tr.appendChild(td4);
+                    tr.appendChild(td5);
+                    tr.appendChild(td6);
+                    tr.appendChild(td7);
+                    tr.appendChild(td8);
+
+                    resultadosAnalisis.appendChild(tr);
+                });
+
+            };
 
         </script>
 

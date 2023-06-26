@@ -25,11 +25,19 @@ const getMarkerColor = () => {
 }
 
 const dibujarMarker = ({ latitud, longitud, nombreNormalizado, geocoder }, color, markers) => {
-    let textoPopup = geocoder + '<br>';
+    let textoPopup = '<b>'+nombreNormalizado + '</b><br>';
+    textoPopup += 'Geocoder: ' + geocoder + '<br>';
     textoPopup += 'Latitud: ' + latitud + '<br>';
     textoPopup += 'Longitud: ' + longitud;
-     
-    var marker = L.marker([latitud, longitud], { icon: color }).bindPopup(textoPopup, { autoClose: false, autoPan: false });
+
+    let marker = L.marker([latitud, longitud], { icon: color }).bindPopup(textoPopup, { autoClose: false, autoPan: false });
+    marker.on('mouseover', function (e) {
+        this.openPopup();
+    });
+
+    marker.on('mouseout', function (e) {
+        this.closePopup();
+    });
 
     markers.addLayer(marker);
 }
@@ -62,19 +70,6 @@ export const getMapa = (callbackDrawMarker, callbackDrawRectangle) => {
         zoomToBoundsOnClick: true,
         spiderLegPolylineOptions: { weight: 3.5, color: '#000' },
         spiderfyDistanceMultiplier: 3.5,
-    });
-
-    markers.on('clusterclick', function (e) {
-        let popupsContent = '';
-
-        e.layer.getAllChildMarkers().forEach(function (marker) {
-            popupsContent += marker.getPopup().getContent() + '<br><br>';
-        });
-
-        const popup = L.popup()
-            .setLatLng(e.latlng)
-            .setContent(popupsContent)
-            .openOn(mapa);
     });
 
     var drawControl = new L.Control.Draw({
