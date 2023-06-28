@@ -36,23 +36,7 @@ export const dibujarListaDeResultados = (elementos, mapa, markers) => {
             puntoBtn.addEventListener('click', () => {
                 //Borrar marcadores anteriores
                 markers.clearLayers();
-
-                let textoPopup = '<b>'+nombreNormalizado + '</b><br>';
-                textoPopup += 'Geocoder: ' + geocoder + '<br>';
-                textoPopup += 'Latitud: ' + latitud + '<br>';
-                textoPopup += 'Longitud: ' + longitud;
-
-                let marker = L.marker([latitud, longitud], { icon: color }).bindPopup(textoPopup, { autoClose: false, autoPan: false });
-                marker.on('mouseover', function (e) {
-                    this.openPopup();
-                });
-
-                marker.on('mouseout', function (e) {
-                    this.closePopup();
-                });
-
-                markers.addLayer(marker);
-    
+   
                 dibujarMarkers(puntos, mapa, markers);
             });
 
