@@ -50,16 +50,16 @@ export const dibujarMarkers = (puntos, mapa, markers) => {
 
         dibujarMarker(punto, color, markers);
     });
-
+        
     //Agrego los marcadores al mapa
     mapa.addLayer(markers);
 }
 
-export const getMapa = (callbackDrawMarker, callbackDrawRectangle) => {
+export const getMapa = (idMapa, zoom) => {
     //dibujo el mapa e inicializo variables que seran utiles luego
-    let mapa = L.map('mapa');
+    let mapa = L.map( idMapa );
     //Se muestra Fing por default
-    mapa.setView([-34.86124493950026, -56.198828092136374], 12);
+    mapa.setView([-34.86124493950026, -56.198828092136374], zoom);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png?', {}).addTo(mapa);
 
     // let markers = new L.FeatureGroup().addTo(mapa);
@@ -71,6 +71,13 @@ export const getMapa = (callbackDrawMarker, callbackDrawRectangle) => {
         spiderLegPolylineOptions: { weight: 3.5, color: '#000' },
         spiderfyDistanceMultiplier: 3.5,
     });
+
+    return { "mapa": mapa, "markers": markers };
+}
+
+export const getMapaToDraw = (idMapa, callbackDrawMarker, callbackDrawRectangle) => {
+
+    let { mapa, markers } = getMapa( idMapa, 8 );
 
     var drawControl = new L.Control.Draw({
         draw: {

@@ -123,7 +123,8 @@
             <!-- ANALISIS -->
             <div class="tab-pane fade" id="analisis-tab-pane" role="tabpanel" aria-labelledby="analisis-tab"
                 tabindex="0">
-                <div class="table-responsive">
+
+                <div class="container table-responsive">
                     <table class="table">
                         <thead>
                             <tr class="text-center">
@@ -134,19 +135,21 @@
                                 <th scope="col">Dirección geocoder</th>
                                 <th scope="col">Latitud</th>
                                 <th scope="col">Longitud</th>
-                                <th scope="col">Distancia (metros)</th>
+                                <th scope="col">Distancia (mts)</th>
+                                <th scope="col">Acciones</th>
                             </tr>
                         </thead>
-                        <tbody id="resultadosAnalisis">
-                            
+                        <tbody id="resultadosAnalisis" style="font-size:0.9rem;">
+
                         </tbody>
                     </table>
                 </div>
+
             </div>
 
         </div>
 
-        <!-- Modal -->
+        <!-- Modal Configuracion avanzada -->
         <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
             aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -180,6 +183,52 @@
             </div>
         </div>
 
+        <!-- Modal Mapa Analisis -->
+        <div class="modal fade" id="modalMapaAnalisis" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+            aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content" style="height: 90vh !important;">
+
+                    <div class="modal-header">
+                        <div class="container">
+                            <div class="row text-end">
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="row gy-2">
+                                <div class="col-6">
+                                    <p class="h5 text-muted">Datos IM</p>
+                                </div>
+                                <div class="col-6">
+                                    <p class="h6 text-muted">Distancia entre putnos: <span id="distancia"></span> metros</p>
+                                </div>
+                                <div class="col-12"><strong>Dirección:</strong> <span id="direccionIM"></span></div>
+                                <div class="col-3"><strong>Latitud:</strong> <span id="latitudIM"></span>
+                                </div>
+                                <div class="col-4"><strong>Longitud:</strong> <span id="longitudIM"></span>
+                                </div>
+                                <hr class="my-3">
+                                <div class="col-12">
+                                    <p class="h5 text-muted">Datos <span id="geocoder"></span></p>
+                                </div>
+                                <div class="col-12"><strong>Dirección:</strong> <span id="direccion">asdadsadsd</span>
+                                </div>
+                                <div class="col-3"><strong>Latitud:</strong> <span id="latitud"></span></div>
+                                <div class="col-4"><strong>Longitud:</strong> <span id="longitud"></span></div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <div id="mapaAnalisis" class="w-100 h-100">
+                            Mapa Analisis
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
         <!-- Libreria necesaria para bootstrap -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous">
@@ -191,7 +240,8 @@
             import { dibujarListaDeResultados } from "./js/logicaListaDeResultados.js";
             import { inicializarConfiguracionAvanzada, setInfoConfigAvanzada } from "./js/logicaConfiguracionAvanzada.js";
             import * as Funciones from "./js/funciones.js";
-            import { getMapa } from "./js/logicaMapa.js";
+            import { getMapa, getMapaToDraw, dibujarMarkers } from "./js/logicaMapa.js";
+            import * as markersColor from "./js/leaflet-color-markers.js";
 
             //Obtengo componentes
             const inputAddress = document.getElementById('address');
@@ -217,7 +267,7 @@
 
                 const resp = await Api.getDirEnPoligo(polygon);
 
-                dibujarListaDeResultados(resp, mapa, markers);                
+                dibujarListaDeResultados(resp, mapa, markers);
             }
 
             //Logica de la aplicacion
@@ -228,7 +278,7 @@
             inicializarConfiguracionAvanzada(formasCanonicas);
             inicializarEventosPuntosSugeridos();
             //Inicializo mapa y markers
-            const { mapa, markers } = getMapa(setCoordenadasDesdeMarker, setCoordenadasDesdeRectangulo);
+            const { mapa, markers } = getMapaToDraw('mapa', setCoordenadasDesdeMarker, setCoordenadasDesdeRectangulo);
 
             btnBuscar.onclick = async () => {
                 const DomListaPuntosSugeridos = document.getElementById('listaPuntosSugereridos');
@@ -245,45 +295,114 @@
                 } else {
                     resp = await Api.getDireccionEstructurada(idGeocoder, idFc, queryParams);
                 }
-                
+
                 dibujarListaDeResultados(resp, mapa, markers);
             };
+
+            //dibujo el mapa e inicializo variables que seran utiles luego
+            const { mapa: mapaAnalisis, markers: markersAnalisis } = getMapa('mapaAnalisis', 15);
+            const modalVerEnMapa = new bootstrap.Modal(document.getElementById('modalMapaAnalisis'));
 
             analisisTab.onclick = async () => {
                 let resp = await Api.getDataAnalisis();
 
-                console.log(resp);
                 let resultadosAnalisis = document.getElementById("resultadosAnalisis");
                 resultadosAnalisis.innerHTML = '';
-                
-                resp.forEach( data => {
+
+                resp.forEach(data => {
+                    data.latitudIM = data.latitudIM.toString();
+                    data.longitudIM = data.longitudIM.toString();
+                    data.latitudGeocoder = data.latitudGeocoder.toString();
+                    data.longitudGeocoder = data.longitudGeocoder.toString();
+                    data.distanciaMetros = data.distanciaMetros.toString();
+
                     const tr = document.createElement('tr');
 
                     const td1 = document.createElement('td');
+                    td1.style = "max-width: 500px";
+                    td1.className = "text-start";
                     td1.innerHTML = data.direccionIM;
 
                     const td2 = document.createElement('td');
-                    td2.innerHTML = data.latitudIM;
+                    td2.title = data.latitudIM;
+                    td2.innerHTML = data.latitudIM.slice(0, 12) + '...';
 
                     const td3 = document.createElement('td');
-                    td3.innerHTML = data.longitudIM;
+                    td3.title = data.longitudIM;
+                    td3.innerHTML = data.longitudIM.slice(0, 12) + '...';
 
                     const td4 = document.createElement('td');
-                    td4.className = "text-center";
                     td4.innerHTML = data.geocoder;
 
                     const td5 = document.createElement('td');
+                    td5.style = "max-width: 250px";
                     td5.innerHTML = data.direccionGeocoder;
 
                     const td6 = document.createElement('td');
-                    td6.innerHTML = data.latitudGeocoder;
+                    td6.title = data.latitudGeocoder;
+                    td6.innerHTML = data.latitudGeocoder.slice(0, 12) + '...';
 
                     const td7 = document.createElement('td');
-                    td7.innerHTML = data.longitudGeocoder;
+                    td7.title = data.longitudGeocoder;
+                    td7.innerHTML = data.longitudGeocoder.slice(0, 12) + '...';
 
                     const td8 = document.createElement('td');
-                    td8.innerHTML = data.distanciaMetros;
+                    td8.title = data.distanciaMetros;
+                    td8.innerHTML = data.distanciaMetros.slice(0, 10) + '...';
 
+                    const btnVerMapa = document.createElement('button');
+                    btnVerMapa.style = "font-size:0.8rem;";
+                    btnVerMapa.className = "btn btn-outline-secondary";
+                    btnVerMapa.innerHTML = '<i class="bi bi-map"></i>&nbsp; Ver en el mapa';
+
+                    btnVerMapa.addEventListener('click', function () {
+                        modalVerEnMapa.show();
+
+                        // Configura y agrega las capas, marcadores, etc.
+                        const puntoIM = {
+                            "latitud": data.latitudIM,
+                            "longitud": data.longitudIM,
+                            "nombreNormalizado": data.direccionIM,
+                            "geocoder": "IM",
+                        }
+                        const punto = {
+                            "latitud": data.latitudGeocoder,
+                            "longitud": data.longitudGeocoder,
+                            "nombreNormalizado": data.direccionGeocoder,
+                            "geocoder": data.geocoder,
+                        }
+                        //Dibujo datos de los puntos en el modal
+                        document.getElementById('direccionIM').innerHTML = puntoIM.nombreNormalizado;
+                        document.getElementById('latitudIM').innerHTML = puntoIM.latitud;
+                        document.getElementById('longitudIM').innerHTML = puntoIM.longitud;
+
+                        document.getElementById('direccion').innerHTML = punto.nombreNormalizado;
+                        document.getElementById('latitud').innerHTML = punto.latitud;
+                        document.getElementById('longitud').innerHTML = punto.longitud;
+                        document.getElementById('geocoder').innerHTML = punto.geocoder;
+                        document.getElementById('distancia').innerHTML = data.distanciaMetros;
+
+                        //Dibujo marcadores en el mapa
+                        markersAnalisis.clearLayers();
+                        dibujarMarkers([puntoIM, punto], mapaAnalisis, markersAnalisis);
+
+                        const point1 = L.latLng(punto.latitud, punto.longitud);
+                        const point2 = L.latLng(puntoIM.latitud, puntoIM.longitud);
+
+                        const line = L.polyline([point1, point2], { color: 'red' }).addTo(mapaAnalisis);
+                        
+                        mapaAnalisis.setView([puntoIM.latitud, puntoIM.longitud], 12);
+                        //PARA MOSTRAR EL MODEL CORRECTAMENTE EN UN MODAL
+                        setTimeout(function () {
+                            mapaAnalisis.invalidateSize();
+                        }, 500);
+
+                    });
+
+                    const td9 = document.createElement('td');
+                    td9.appendChild(btnVerMapa);
+
+                    tr.className = "text-center";
                     tr.appendChild(td1);
                     tr.appendChild(td2);
                     tr.appendChild(td3);
@@ -292,6 +411,7 @@
                     tr.appendChild(td6);
                     tr.appendChild(td7);
                     tr.appendChild(td8);
+                    tr.appendChild(td9);
 
                     resultadosAnalisis.appendChild(tr);
                 });
