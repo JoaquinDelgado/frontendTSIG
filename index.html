@@ -200,7 +200,7 @@
                                     <p class="h5 text-muted">Datos IM</p>
                                 </div>
                                 <div class="col-6">
-                                    <p class="h6 text-muted">Distancia entre putnos: <span id="distancia"></span> metros</p>
+                                    <p class="h6 text-muted">Distancia entre puntos: <span id="distancia"></span> metros</p>
                                 </div>
                                 <div class="col-12"><strong>Dirección:</strong> <span id="direccionIM"></span></div>
                                 <div class="col-3"><strong>Latitud:</strong> <span id="latitudIM"></span>
@@ -388,8 +388,6 @@
 
                         const point1 = L.latLng(punto.latitud, punto.longitud);
                         const point2 = L.latLng(puntoIM.latitud, puntoIM.longitud);
-
-                        const line = L.polyline([point1, point2], { color: 'red' }).addTo(mapaAnalisis);
 
                         mapaAnalisis.setView([puntoIM.latitud, puntoIM.longitud], 12);
                         //PARA MOSTRAR EL MODEL CORRECTAMENTE EN UN MODAL
