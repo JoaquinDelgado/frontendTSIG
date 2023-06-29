@@ -1,4 +1,4 @@
-const departamentoLocalidades = {
+export const departamentoLocalidades = {
     "ARTIGAS": ["ARTIGAS", "BELLA UNIÓN", "TOMÁS GOMENSORO"],
     "CANELONES": ["CANELONES", "SANTA LUCÍA", "LAS PIEDRAS"],
     "CERRO LARGO": ["MELO", "RÍO BRANCO", "FRAILE MUERTO"],

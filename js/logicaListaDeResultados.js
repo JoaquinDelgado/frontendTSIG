@@ -5,7 +5,7 @@ export const dibujarListaDeResultados = (elementos, mapa, markers) => {
     listaDeResultados.innerHTML = '';
     listaDeResultados.classList.remove("overflow-y-scroll");
     
-    if (!elementos) {
+    if ( (typeof elementos.forEach) == 'undefined' ) {
         console.log('No vinieron resultados');
     } else {
         listaDeResultados.classList.add("overflow-y-scroll"); //para poder hacer scroll en la lista de resultados
@@ -38,6 +38,7 @@ export const dibujarListaDeResultados = (elementos, mapa, markers) => {
                 markers.clearLayers();
    
                 dibujarMarkers(puntos, mapa, markers);
+                mapa.setView([puntos[0].latitud, puntos[0].longitud], 12);
             });
 
             //utilizo bootstrap para alinear

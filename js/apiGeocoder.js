@@ -72,7 +72,13 @@ export const getDireccionEstructurada = (idGeoCoder, idFormaCanonica, paramBusca
         .then(response => response.json())
         .then(response => {
             return response;
+        })
+        .catch( (err) => {
+            console.log('Error en buscar direccion. ERROR:' + err);
+
+            return [];
         });
+
     return data;
 
 }

@@ -53,5 +53,8 @@ export const dibujarListaDePuntosSugeridos = (puntos) => {
 
     //Muestro los elementos en el html
     DomListaPuntosSugeridos.style.display = 'block';
+    DomListaPuntosSugeridos.style.zIndex = '9999';
     DomListaPuntosSugeridos.classList.add("overflow-y-scroll");
+
+    document.getElementById("body").appendChild(element);
 }

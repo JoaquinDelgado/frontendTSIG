@@ -390,7 +390,7 @@
                         const point2 = L.latLng(puntoIM.latitud, puntoIM.longitud);
 
                         const line = L.polyline([point1, point2], { color: 'red' }).addTo(mapaAnalisis);
-                        
+
                         mapaAnalisis.setView([puntoIM.latitud, puntoIM.longitud], 12);
                         //PARA MOSTRAR EL MODEL CORRECTAMENTE EN UN MODAL
                         setTimeout(function () {
